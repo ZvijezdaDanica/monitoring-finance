@@ -22,6 +22,9 @@ public class Transaction {
     @Positive(message = "Amount must be positive")
     private Double amount;
 
+    @Column(name = "value")
+    private Double value;
+
     @NotNull(message = "Transaction type is required")
     @Enumerated(EnumType.STRING)
     private TransactionTypes type;
@@ -35,6 +38,4 @@ public class Transaction {
 
     private LocalDateTime date;
 
-    @Positive(message = "Crypto price must be positive")
-    private Double cryptoPrice;
 }

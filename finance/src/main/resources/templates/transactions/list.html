@@ -1,12 +1,18 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Transactions</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <title>Transactions List</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-<h1>Transactions</h1>
-<a href="/transactions/new">Add New Transaction</a>
-<table border="1">
+
+<div class="nav-links">
+    <a href="/transactions/new">Add New Transaction</a>
+</div>
+
+<table>
     <thead>
     <tr>
         <th>ID</th>
@@ -15,26 +21,109 @@
         <th>Currency</th>
         <th>Description</th>
         <th>Date</th>
-        <th>Crypto Price</th>
-        <th>Actions</th>
+        <th>Value (RSD)</th>
+        <th>Edit</th>
+        <th>Delete</th>
     </tr>
     </thead>
     <tbody>
-    <tr th:each="transaction : ${transactions}">
-        <td th:text="${transaction.id}"></td>
-        <td th:text="${transaction.amount}"></td>
-        <td th:text="${transaction.type}"></td>
-        <td th:text="${transaction.currency}"></td>
-        <td th:text="${transaction.description}"></td>
-        <td th:text="${transaction.date}"></td>
-        <td th:text="${transaction.cryptoPrice}"></td>
+    <tr th:each="transaction : ${transactions}" th:if="${transaction != null}">
+        <td th:text="${transaction.id}">1</td>
+        <td th:text="${transaction.amount}">100.0</td>
+        <td th:text="${transaction.type}">ADD</td>
+        <td th:text="${transaction.currency}">USD</td>
+        <td th:text="${transaction.description}">Sample description</td>
+        <td th:text="${transaction.date != null ? #temporals.format(transaction.date, 'yyyy-MM-dd HH:mm') : 'N/A'}">2025-04-21 14:00</td>
+        <td th:text="${transaction.value}">RSD Value</td>
         <td>
-            <a th:href="@{'/transactions/edit/' + ${transaction.id}}">Edit</a> |
+            <a th:href="@{'/transactions/edit/' + ${transaction.id}}">Edit</a>
+        </td>
+        <td>
             <a th:href="@{'/transactions/delete/' + ${transaction.id}}"
-               onclick="return confirm('Are you sure?');">Delete</a>
+               onclick="return confirm('Are you sure you want to delete this transaction?');">Delete</a>
         </td>
     </tr>
     </tbody>
 </table>
+
+<h2>Transaction Amounts by Currency</h2>
+<div style="max-width: 600px; margin: 20px auto;">
+    <canvas id="currencyPieChart"></canvas>
+</div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const currencyValues = [[${currentValueByCurrency}]];      // Pie slice values (current values)
+    const currencyAmounts = [[${currentAmountByCurrency}]];    // Tooltip amounts (current amounts)
+    const labels = Object.keys(currencyValues);
+    const data = Object.values(currencyValues);
+    const amounts = labels.map(label => currencyAmounts[label] || 0);
+    const backgroundColors = [
+        '#FF6384', '#36A2EB', '#FFCE56',
+        '#8BC34A', '#FF9800', '#9C27B0'
+    ];
+
+    const ctx = document.getElementById('currencyPieChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data,
+                backgroundColor: backgroundColors,
+                borderColor: '#fff',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom' },
+                title: {
+                    display: true,
+                    text: 'Current Transaction Value by Currency (RSD)'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.parsed || 0;
+                            const index = context.dataIndex;
+                            const amount = amounts[index] || 0;
+                            return `${label}: ${value.toFixed(2)} RSD (Amount: ${amount.toFixed(2)})`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+    /*]]>*/
+</script>
+
+<div style="margin: 20px 0;">
+
+    <h3>Total Current Value (RSD): <strong th:text="${totalCurrentValue}">0.00</strong></h3>
+    <br>
+    <h4>Current Value by Currency (RSD):</h4>
+    <ul>
+        <li th:each="entry : ${currentValueByCurrency}">
+            <strong th:text="${entry.key}">USD</strong>:
+            <span th:text="${#numbers.formatDecimal(entry.value, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+        </li>
+    </ul>
+    <br>
+    <h3>Total Value of All Transactions (RSD): <strong th:text="${totalValue}">0.00</strong></h3>
+    <br>
+
+    <h4>Value by Currency (RSD):</h4>
+    <ul>
+        <li th:each="entry : ${valueByCurrency}">
+            <strong th:text="${entry.key}">USD</strong>:
+            <span th:text="${#numbers.formatDecimal(entry.value, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+        </li>
+    </ul>
+
+</div>
+
 </body>
 </html>

@@ -2,46 +2,58 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title th:text="${transaction.id} != null ? 'Edit Transaction' : 'New Transaction'">Transaction Form</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
 </head>
 <body>
-<h1 th:text="${transaction.id} != null ? 'Edit Transaction' : 'New Transaction'"></h1>
+
+<h1 th:text="${transaction.id} != null ? 'Edit Transaction' : 'New Transaction'">Transaction Form</h1>
+
+<div class="nav-links">
+    <a href="/transactions">Back to List</a>
+</div>
 
 <form th:action="@{/transactions}" th:object="${transaction}" method="post">
     <input type="hidden" th:field="*{id}" />
 
-    <label>Amount:</label>
-    <input type="number" step="0.0001" th:field="*{amount}" required />
-    <div th:if="${#fields.hasErrors('amount')}" th:errors="*{amount}"></div>
+    <div>
+        <label for="amount">Amount:</label>
+        <input type="number" step="0.0001" th:field="*{amount}" required />
+        <div class="error" th:if="${#fields.hasErrors('amount')}" th:errors="*{amount}"></div>
+    </div>
 
-    <label>Type:</label>
-    <select th:field="*{type}" required>
-        <option th:each="type : ${T(com.monitoring.finance.enums.TransactionTypes).values()}"
-                th:value="${type}" th:text="${type}"></option>
-    </select>
-    <div th:if="${#fields.hasErrors('type')}" th:errors="*{type}"></div>
+    <div>
+        <label for="type">Type:</label>
+        <select th:field="*{type}" required>
+            <option th:each="type : ${T(com.monitoring.finance.enums.TransactionTypes).values()}"
+                    th:value="${type}" th:text="${type}"></option>
+        </select>
+        <div class="error" th:if="${#fields.hasErrors('type')}" th:errors="*{type}"></div>
+    </div>
 
-    <label>Currency:</label>
-    <select th:field="*{currency}" required>
-        <option th:each="currency : ${T(com.monitoring.finance.enums.Currencies).values()}"
-                th:value="${currency}" th:text="${currency}"></option>
-    </select>
-    <div th:if="${#fields.hasErrors('currency')}" th:errors="*{currency}"></div>
+    <div>
+        <label for="currency">Currency:</label>
+        <select th:field="*{currency}" required>
+            <option th:each="currency : ${T(com.monitoring.finance.enums.Currencies).values()}"
+                    th:value="${currency}" th:text="${currency}"></option>
+        </select>
+        <div class="error" th:if="${#fields.hasErrors('currency')}" th:errors="*{currency}"></div>
+    </div>
 
-    <label>Description:</label>
-    <textarea th:field="*{description}" rows="3" cols="30"></textarea>
-    <div th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
+    <div>
+        <label for="description">Description:</label>
+        <textarea th:field="*{description}" rows="3" maxlength="500"></textarea>
+        <div class="error" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
+    </div>
 
-    <label>Date:</label>
-    <input type="datetime-local" th:field="*{date}" />
-    <div th:if="${#fields.hasErrors('date')}" th:errors="*{date}"></div>
+    <div>
+        <label for="date">Date:</label>
+        <input type="datetime-local" th:field="*{date}" />
+        <div class="error" th:if="${#fields.hasErrors('date')}" th:errors="*{date}"></div>
+    </div>
 
-    <label>Crypto Price:</label>
-    <input type="number" step="0.01" th:field="*{cryptoPrice}" />
-    <div th:if="${#fields.hasErrors('cryptoPrice')}" th:errors="*{cryptoPrice}"></div>
-
-    <button type="submit">Save</button>
+    <button type="submit">Save Transaction</button>
 </form>
 
-<a href="/transactions">Back to list</a>
 </body>
 </html>

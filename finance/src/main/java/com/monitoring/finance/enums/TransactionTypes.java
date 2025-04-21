@@ -3,6 +3,5 @@ package com.monitoring.finance.enums;
 public enum TransactionTypes {
     ADD,
     SPEND,
-    CRYPTO_BUY,
-    CRYPTO_SELL
+    //TODO: CONVERT - will require additional business logic - TODO
 }
